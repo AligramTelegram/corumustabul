@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { JsonLd } from "@/components/JsonLd";
 import { Analytics } from "@/components/Analytics";
+import { ClickTracking } from "@/components/ClickTracking";
 import { CookieBanner } from "@/components/CookieBanner";
 import { orgJsonLd, webSiteJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Footer />
         <CookieBanner />
         <Analytics />
+        <ClickTracking />
       </body>
     </html>
   );
