@@ -108,14 +108,20 @@ export default async function CategoryDistrictPage({ params }: Props) {
             <SunHeading>
               {d.name} bölgesindeki {c.shortName.toLowerCase()} ustaları
             </SunHeading>
-            <ProList pros={pros} />
+            <ProList
+              pros={pros}
+              emptyLabel={`${d.name} bölgesinde ${c.name.toLowerCase()} iş kolunda henüz kayıtlı usta yok.`}
+            />
             {pros.length === 0 && (
-              <p className="mt-4 text-sm text-muted">
-                Şu an {d.name} için doğrudan kayıt yok. Çorum geneli liste için{" "}
-                <Link href={`/${c.slug}`} className="font-medium text-orange underline">
+              <p className="mt-3 text-sm text-muted">
+                Çorum geneli liste için{" "}
+                <Link
+                  href={`/${c.slug}`}
+                  className="font-medium text-orange underline"
+                >
                   Çorum {c.name}
                 </Link>{" "}
-                sayfasına bakın.
+                sayfasına bakabilirsiniz.
               </p>
             )}
           </section>

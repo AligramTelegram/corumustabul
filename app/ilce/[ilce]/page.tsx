@@ -85,7 +85,10 @@ export default async function DistrictPage({ params }: Props) {
 
       <section className="mt-10">
         <SunHeading as="h2">{d.name} bölgesindeki kayıtlı ustalar</SunHeading>
-        <ProList pros={pros} />
+        <ProList
+          pros={pros}
+          emptyLabel={`${d.name} bölgesinde henüz kayıtlı usta yok.`}
+        />
       </section>
 
       <LinkChips

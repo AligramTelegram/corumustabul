@@ -106,7 +106,10 @@ export default async function CategoryHub({ params }: Props) {
         <SunHeading as="h2">
           Çorum geneli {c.name.toLowerCase()} ustaları
         </SunHeading>
-        <ProList pros={pros} />
+        <ProList
+          pros={pros}
+          emptyLabel={`Çorum'da ${c.name.toLowerCase()} iş kolunda henüz kayıtlı usta yok.`}
+        />
       </section>
 
       <div className="mt-10 grid gap-6 sm:grid-cols-2">

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Icon } from "@/components/Icon";
 import { ContactButtons } from "@/components/ContactButtons";
 import { getCategory, getDistrict } from "@/lib/data";
+import { site } from "@/lib/site";
 import type { Pro } from "@/lib/types";
 
 export function ProCard({ pro }: { pro: Pro }) {
@@ -71,16 +72,40 @@ export function ProCard({ pro }: { pro: Pro }) {
   );
 }
 
-export function ProList({ pros }: { pros: Pro[] }) {
+export function ProList({
+  pros,
+  emptyLabel,
+}: {
+  pros: Pro[];
+  emptyLabel?: string;
+}) {
   if (pros.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-border-strong bg-surface/60 p-6 text-sm text-muted">
-        Bu bölge için henüz kayıtlı usta yok. Diğer ilçelere veya yakın iş
-        kollarına bakabilir, ya da{" "}
-        <Link href="/isletme-ekle" className="font-medium text-orange underline">
-          işletmenizi ekleyebilirsiniz
-        </Link>
-        .
+      <div className="rounded-2xl border border-dashed border-border-strong bg-wash p-6">
+        <p className="font-display font-semibold text-ink">
+          {emptyLabel ?? "Bu iş kolunda henüz kayıtlı usta yok."}
+        </p>
+        <p className="mt-1.5 text-sm text-ink-soft">
+          Usta ya da hizmet firmasıysanız, bu listede{" "}
+          <span className="font-medium text-ink">ilk siz</span> yer alabilirsiniz.
+          Bir usta tanıyorsanız da bize önerin.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link
+            href="/isletme-ekle"
+            className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-fg"
+          >
+            İşletme ekle
+          </Link>
+          <a
+            href={`https://wa.me/${site.whatsapp}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-full border border-border-strong px-4 py-2 text-sm font-semibold text-ink hover:border-orange hover:text-orange"
+          >
+            WhatsApp'tan yaz
+          </a>
+        </div>
       </div>
     );
   }
