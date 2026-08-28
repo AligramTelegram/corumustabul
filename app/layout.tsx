@@ -1,0 +1,57 @@
+import type { Metadata } from "next";
+import { Fraunces, Hanken_Grotesk } from "next/font/google";
+import "./globals.css";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { JsonLd } from "@/components/JsonLd";
+import { Analytics } from "@/components/Analytics";
+import { CookieBanner } from "@/components/CookieBanner";
+import { orgJsonLd, webSiteJsonLd } from "@/lib/seo";
+import { site } from "@/lib/site";
+
+const fraunces = Fraunces({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-fraunces",
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+});
+
+const hanken = Hanken_Grotesk({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-hanken",
+});
+
+export const metadata: Metadata = {
+  metadataBase: new URL(site.url),
+  title: {
+    default: `${site.name} - Çorum'da Usta ve Hizmet Firması Bul`,
+    template: `%s | ${site.name}`,
+  },
+  description: site.description,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "tr_TR",
+    siteName: site.name,
+    url: site.url,
+  },
+  robots: { index: true, follow: true },
+};
+
+export default function RootLayout({ children }: LayoutProps<"/">) {
+  return (
+    <html
+      lang="tr"
+      className={`${fraunces.variable} ${hanken.variable} h-full`}
+    >
+      <body className="flex min-h-full flex-col">
+        <JsonLd data={[orgJsonLd(), webSiteJsonLd()]} />
+        <Navbar />
+        <main className="flex-1">{children}</main>
+        <Footer />
+        <CookieBanner />
+        <Analytics />
+      </body>
+    </html>
+  );
+}

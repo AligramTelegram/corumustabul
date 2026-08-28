@@ -1,0 +1,21 @@
+# Çorum Usta Bul
+
+> corumustabul.com — Çorum ili ve 13 ilçesinde usta ve hizmet firması dizini.
+> Ziyaretçiler iş koluna ve ilçeye göre usta bulur, doğrudan telefon/WhatsApp ile ulaşır.
+> Ustalar dizine WhatsApp üzerinden başvurarak katılır; komisyon yoktur.
+
+## Kapsam
+- İş kolları: çilingir, oto çekici, tıkanıklık açma, su kaçağı tespiti, elektrik arıza,
+  kombi arıza, beyaz eşya servisi, doğalgaz tesisat, elektrikçi, su tesisatçısı, boya-badana,
+  fayans-seramik, alçıpan, marangoz, PVC-cam balkon, demir-kaynak, çatı-yalıtım, klima,
+  nakliyat, ev temizliği.
+- İlçeler: Merkez, Alaca, Bayat, Boğazkale, Dodurga, İskilip, Kargı, Laçin, Mecitözü,
+  Oğuzlar, Ortaköy, Osmancık, Sungurlu, Uğurludağ.
+
+## Önemli sayfalar
+- /kategoriler — tüm iş kolları
+- /[is-kolu] — iş kolu rehberi + il geneli ustalar
+- /[is-kolu]/[ilce] — ilçe bazlı usta listesi
+- /ilce/[ilce] — ilçedeki tüm iş kolları
+- /rehber — usta, tadilat ve bakım rehber yazıları
+- /isletme-ekle — dizine katılmak için başvuru

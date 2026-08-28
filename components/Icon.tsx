@@ -1,0 +1,75 @@
+import {
+  KeyRound,
+  Truck,
+  Waves,
+  Droplets,
+  Zap,
+  Flame,
+  WashingMachine,
+  FlameKindling,
+  Plug,
+  Wrench,
+  PaintRoller,
+  Grid3x3,
+  SquareStack,
+  Hammer,
+  PanelsTopLeft,
+  Anvil,
+  Home,
+  AirVent,
+  Boxes,
+  Sparkles,
+  Phone,
+  MessageCircle,
+  MapPin,
+  Clock,
+  CheckCircle2,
+  ChevronRight,
+  Search,
+  Globe,
+  Star,
+  type LucideIcon,
+} from "lucide-react";
+
+const map: Record<string, LucideIcon> = {
+  KeyRound,
+  Truck,
+  Waves,
+  Droplets,
+  Zap,
+  Flame,
+  WashingMachine,
+  FlameKindling,
+  Plug,
+  Wrench,
+  PaintRoller,
+  Grid3x3,
+  SquareStack,
+  Hammer,
+  PanelsTopLeft,
+  Anvil,
+  Home,
+  AirVent,
+  Boxes,
+  Sparkles,
+  Phone,
+  MessageCircle,
+  MapPin,
+  Clock,
+  CheckCircle2,
+  ChevronRight,
+  Search,
+  Globe,
+  Star,
+};
+
+export function Icon({
+  name,
+  className,
+}: {
+  name: string;
+  className?: string;
+}) {
+  const C = map[name] ?? Wrench;
+  return <C className={className} aria-hidden />;
+}
