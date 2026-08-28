@@ -71,9 +71,18 @@ export function orgJsonLd() {
     "@type": "Organization",
     name: site.name,
     url: site.url,
+    logo: `${site.url}/emblem.png`,
     description: site.description,
     email: site.email,
+    telephone: site.phone,
     areaServed: { "@type": "AdministrativeArea", name: "Çorum" },
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: site.phone,
+      contactType: "customer service",
+      areaServed: "TR",
+      availableLanguage: "Turkish",
+    },
   };
 }
 
