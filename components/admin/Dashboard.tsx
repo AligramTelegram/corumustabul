@@ -193,48 +193,57 @@ export function Dashboard({ pros }: { pros: ProWithId[] }) {
         {rows.map(({ p, b, d }) => (
           <div
             key={p.id}
-            className="flex flex-wrap items-center gap-3 border-b border-border px-4 py-3 last:border-0"
+            className="border-b border-border px-4 py-3 last:border-0"
           >
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <Link
-                  href={`/admin/usta/${p.id}`}
-                  className="font-medium text-ink hover:text-orange"
-                >
-                  {p.businessName}
-                </Link>
-                <span
-                  className={`rounded-full px-1.5 text-xs font-semibold ${bucketClass[b]}`}
-                >
-                  {bucketLabel[b]}
-                </span>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <Link
+                    href={`/admin/usta/${p.id}`}
+                    className="font-medium text-ink hover:text-orange"
+                  >
+                    {p.businessName}
+                  </Link>
+                  <span
+                    className={`rounded-full px-1.5 text-xs font-semibold ${bucketClass[b]}`}
+                  >
+                    {bucketLabel[b]}
+                  </span>
+                  {p.featured && (
+                    <span className="rounded-full bg-bordo/10 px-1.5 text-xs font-semibold text-bordo">
+                      ★
+                    </span>
+                  )}
+                </div>
+                <p className="mt-0.5 truncate text-xs text-muted">
+                  {p.categories.map(catName).join(", ")} · {p.phoneDisplay}
+                  {p.rating != null && ` · ${p.rating.toFixed(1)}★`}
+                </p>
               </div>
-              <p className="truncate text-xs text-muted">
-                {p.categories.map(catName).join(", ")} · {p.phoneDisplay}
-                {p.rating != null && ` · ${p.rating.toFixed(1)}★`}
-              </p>
-            </div>
-            <div className="text-right text-xs">
-              <div className="text-ink-soft">{fmt(p.paidUntil)}</div>
-              <div
-                className={
-                  d < 0
-                    ? "text-bordo"
-                    : d <= 14
-                      ? "text-orange-deep"
-                      : "text-muted"
-                }
-              >
-                {d < 0 ? `${-d} gün geçti` : `${d} gün kaldı`}
+              <div className="shrink-0 text-right text-xs">
+                <div className="text-ink-soft">{fmt(p.paidUntil)}</div>
+                <div
+                  className={
+                    d < 0
+                      ? "font-semibold text-bordo"
+                      : d <= 14
+                        ? "font-semibold text-orange-deep"
+                        : "text-muted"
+                  }
+                >
+                  {d < 0 ? `${-d} gün geçti` : `${d} gün kaldı`}
+                </div>
               </div>
             </div>
-            <RowActions
-              id={p.id}
-              slug={p.slug}
-              status={p.status}
-              featured={p.featured}
-              paidUntil={p.paidUntil}
-            />
+            <div className="mt-2 flex justify-end">
+              <RowActions
+                id={p.id}
+                slug={p.slug}
+                status={p.status}
+                featured={p.featured}
+                paidUntil={p.paidUntil}
+              />
+            </div>
           </div>
         ))}
       </div>

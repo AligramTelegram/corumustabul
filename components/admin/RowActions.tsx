@@ -26,7 +26,7 @@ export function RowActions({
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
-  const [menu, setMenu] = useState(false);
+  const [open, setOpen] = useState(false);
 
   async function patch(body: Record<string, unknown>) {
     setBusy(true);
@@ -36,7 +36,7 @@ export function RowActions({
       body: JSON.stringify(body),
     });
     setBusy(false);
-    setMenu(false);
+    setOpen(false);
     router.refresh();
   }
 
@@ -45,88 +45,104 @@ export function RowActions({
     setBusy(true);
     await fetch(`/api/admin/pros/${id}`, { method: "DELETE" });
     setBusy(false);
+    setOpen(false);
     router.refresh();
   }
 
+  const item =
+    "block w-full rounded-lg px-2.5 py-2 text-left text-sm hover:bg-wash disabled:opacity-40";
+
   return (
-    <div className="flex items-center gap-1.5 text-xs">
+    <div className="relative">
       <button
         disabled={busy}
-        onClick={() => patch({ featured: !featured })}
-        title="Vitrin"
-        className={`rounded-md px-2 py-1 font-medium ${
-          featured
-            ? "bg-bordo/10 text-bordo"
-            : "bg-black/5 text-muted hover:text-ink"
-        } disabled:opacity-40`}
+        onClick={() => setOpen((o) => !o)}
+        className="rounded-lg border border-border-strong bg-white px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
       >
-        {featured ? "★ vitrin" : "☆ vitrin"}
+        İşlemler ▾
       </button>
 
-      <button
-        disabled={busy}
-        onClick={() =>
-          patch({ status: status === "active" ? "passive" : "active" })
-        }
-        className="rounded-md bg-black/5 px-2 py-1 font-medium text-muted hover:text-ink disabled:opacity-40"
-      >
-        {status === "active" ? "pasifleştir" : "aktifleştir"}
-      </button>
+      {open && (
+        <>
+          <button
+            aria-label="kapat"
+            onClick={() => setOpen(false)}
+            className="fixed inset-0 z-20 cursor-default"
+          />
+          <div className="absolute right-0 z-30 mt-1 w-56 rounded-xl border border-border-strong bg-white p-1 shadow-xl">
+            <button
+              disabled={busy}
+              onClick={() => patch({ featured: !featured })}
+              className={item}
+            >
+              {featured ? "★ Vitrinden çıkar" : "☆ Vitrine al"}
+            </button>
+            <button
+              disabled={busy}
+              onClick={() =>
+                patch({ status: status === "active" ? "passive" : "active" })
+              }
+              className={item}
+            >
+              {status === "active" ? "Pasifleştir" : "Aktifleştir"}
+            </button>
 
-      <div className="relative">
-        <button
-          disabled={busy}
-          onClick={() => setMenu((m) => !m)}
-          className="rounded-md bg-black/5 px-2 py-1 font-medium text-muted hover:text-ink disabled:opacity-40"
-        >
-          uzat ▾
-        </button>
-        {menu && (
-          <div className="absolute right-0 z-10 mt-1 w-32 overflow-hidden rounded-lg border border-border-strong bg-white shadow-lg">
-            {[
-              ["+1 ay", 1],
-              ["+3 ay", 3],
-              ["+6 ay", 6],
-              ["+1 yıl", 12],
-            ].map(([label, m]) => (
-              <button
-                key={label as string}
-                onClick={() =>
-                  patch({
-                    paidUntil: addMonths(paidUntil, m as number),
-                    status: "active",
-                  })
-                }
-                className="block w-full px-3 py-1.5 text-left hover:bg-wash"
-              >
-                {label}
-              </button>
-            ))}
+            <div className="my-1 border-t border-border" />
+            <div className="px-2.5 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-muted">
+              Süre uzat
+            </div>
+            <div className="grid grid-cols-2 gap-1 px-1 pb-1">
+              {(
+                [
+                  ["+1 ay", 1],
+                  ["+3 ay", 3],
+                  ["+6 ay", 6],
+                  ["+1 yıl", 12],
+                ] as const
+              ).map(([label, m]) => (
+                <button
+                  key={label}
+                  disabled={busy}
+                  onClick={() =>
+                    patch({
+                      paidUntil: addMonths(paidUntil, m),
+                      status: "active",
+                    })
+                  }
+                  className="rounded-lg bg-black/5 px-2 py-1.5 text-sm font-medium hover:bg-black/10 disabled:opacity-40"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className="my-1 border-t border-border" />
+            <Link
+              href={`/admin/usta/${id}`}
+              onClick={() => setOpen(false)}
+              className={item}
+            >
+              Düzenle
+            </Link>
+            <a
+              href={`/usta/${slug}`}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => setOpen(false)}
+              className={item}
+            >
+              Sitede gör
+            </a>
+            <button
+              disabled={busy}
+              onClick={del}
+              className={`${item} text-bordo`}
+            >
+              Sil
+            </button>
           </div>
-        )}
-      </div>
-
-      <Link
-        href={`/admin/usta/${id}`}
-        className="rounded-md px-2 py-1 font-medium text-orange hover:underline"
-      >
-        düzenle
-      </Link>
-      <a
-        href={`/usta/${slug}`}
-        target="_blank"
-        rel="noreferrer"
-        className="rounded-md px-2 py-1 text-muted hover:text-orange"
-      >
-        gör
-      </a>
-      <button
-        disabled={busy}
-        onClick={del}
-        className="rounded-md px-2 py-1 text-bordo hover:underline disabled:opacity-40"
-      >
-        sil
-      </button>
+        </>
+      )}
     </div>
   );
 }
