@@ -186,7 +186,7 @@ export function Dashboard({ pros }: { pros: ProWithId[] }) {
       </div>
 
       {/* Liste */}
-      <div className="overflow-hidden rounded-xl border border-border-strong bg-white">
+      <div className="rounded-xl border border-border-strong bg-white [&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl">
         {rows.length === 0 && (
           <p className="p-5 text-sm text-muted">Kayıt yok.</p>
         )}

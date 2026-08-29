@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 function addMonths(iso: string, months: number): string {
   const base = new Date(iso + "T00:00:00");
@@ -27,6 +27,16 @@ export function RowActions({
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState(false);
+  const [up, setUp] = useState(false);
+  const btn = useRef<HTMLButtonElement>(null);
+
+  function toggle() {
+    if (!open && btn.current) {
+      const r = btn.current.getBoundingClientRect();
+      setUp(window.innerHeight - r.bottom < 340);
+    }
+    setOpen((o) => !o);
+  }
 
   async function patch(body: Record<string, unknown>) {
     setBusy(true);
@@ -55,8 +65,9 @@ export function RowActions({
   return (
     <div className="relative">
       <button
+        ref={btn}
         disabled={busy}
-        onClick={() => setOpen((o) => !o)}
+        onClick={toggle}
         className="rounded-lg border border-border-strong bg-white px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-40"
       >
         İşlemler ▾
@@ -69,7 +80,11 @@ export function RowActions({
             onClick={() => setOpen(false)}
             className="fixed inset-0 z-20 cursor-default"
           />
-          <div className="absolute right-0 z-30 mt-1 w-56 rounded-xl border border-border-strong bg-white p-1 shadow-xl">
+          <div
+            className={`absolute right-0 z-30 w-56 rounded-xl border border-border-strong bg-white p-1 shadow-xl ${
+              up ? "bottom-full mb-1" : "top-full mt-1"
+            }`}
+          >
             <button
               disabled={busy}
               onClick={() => patch({ featured: !featured })}
