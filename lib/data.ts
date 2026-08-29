@@ -1,13 +1,9 @@
 import { categories, getCategory } from "@/data/categories";
 import { districts, getDistrict } from "@/data/districts";
-import { activePros } from "@/data/pros";
+import { getActivePros } from "@/lib/pros";
 import type { Pro } from "@/lib/types";
 
 export { categories, districts, getCategory, getDistrict };
-
-export function getPro(slug: string): Pro | undefined {
-  return activePros().find((p) => p.slug === slug);
-}
 
 /** Vitrin (featured) önce, sonra puana, sonra yorum sayısına göre */
 export function sortPros(list: Pro[]): Pro[] {
@@ -20,30 +16,32 @@ export function sortPros(list: Pro[]): Pro[] {
   );
 }
 
-export function prosByCategory(categorySlug: string): Pro[] {
-  return sortPros(
-    activePros().filter((p) => p.categories.includes(categorySlug)),
-  );
+export async function getPro(slug: string): Promise<Pro | undefined> {
+  const all = await getActivePros();
+  return all.find((p) => p.slug === slug);
 }
 
-export function prosByCategoryDistrict(
+export async function prosByCategory(categorySlug: string): Promise<Pro[]> {
+  const all = await getActivePros();
+  return sortPros(all.filter((p) => p.categories.includes(categorySlug)));
+}
+
+export async function prosByCategoryDistrict(
   categorySlug: string,
   districtSlug: string,
-): Pro[] {
-  return prosByCategory(categorySlug).filter((p) =>
-    p.districts.includes(districtSlug),
-  );
+): Promise<Pro[]> {
+  const list = await prosByCategory(categorySlug);
+  return list.filter((p) => p.districts.includes(districtSlug));
 }
 
-export function prosByDistrict(districtSlug: string): Pro[] {
-  return sortPros(
-    activePros().filter((p) => p.districts.includes(districtSlug)),
-  );
+export async function prosByDistrict(districtSlug: string): Promise<Pro[]> {
+  const all = await getActivePros();
+  return sortPros(all.filter((p) => p.districts.includes(districtSlug)));
 }
 
-export function categoriesInDistrict(districtSlug: string) {
+export async function categoriesInDistrict(districtSlug: string) {
   const set = new Set<string>();
-  for (const p of prosByDistrict(districtSlug)) {
+  for (const p of await prosByDistrict(districtSlug)) {
     p.categories.forEach((c) => set.add(c));
   }
   return categories.filter((c) => set.has(c.slug));

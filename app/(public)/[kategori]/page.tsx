@@ -26,6 +26,7 @@ export function generateStaticParams() {
 }
 
 export const dynamicParams = false;
+export const revalidate = 600;
 
 type Props = { params: Promise<{ kategori: string }> };
 
@@ -45,7 +46,7 @@ export default async function CategoryHub({ params }: Props) {
   const c = getCategory(kategori);
   if (!c) notFound();
 
-  const pros = prosByCategory(c.slug);
+  const pros = await prosByCategory(c.slug);
   const related = relatedCategories(c.slug);
   const rehberler = postsForCategory(c.slug);
   const crumbs = [

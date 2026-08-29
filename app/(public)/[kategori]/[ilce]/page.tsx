@@ -34,6 +34,7 @@ export function generateStaticParams() {
 }
 
 export const dynamicParams = false;
+export const revalidate = 600;
 
 type Props = { params: Promise<{ kategori: string; ilce: string }> };
 
@@ -58,14 +59,14 @@ export default async function CategoryDistrictPage({ params }: Props) {
   const d = getDistrict(ilce);
   if (!c || !d) notFound();
 
-  const pros = prosByCategoryDistrict(c.slug, d.slug);
+  const pros = await prosByCategoryDistrict(c.slug, d.slug);
   const lead = districtCategoryIntro(c, d).slice(0, 2);
   const sections = comboSections(c, d);
   const extraFaq = comboFaq(c, d);
   const faq = [{ q: extraFaq.q, a: extraFaq.a }, ...c.faq];
   const neighbors = neighborDistricts(d.slug);
   const related = relatedCategories(c.slug);
-  const otherCats = categoriesInDistrict(d.slug).filter((x) => x.slug !== c.slug);
+  const otherCats = (await categoriesInDistrict(d.slug)).filter((x) => x.slug !== c.slug);
 
   const crumbs = [
     { name: "Ana Sayfa", path: "/" },

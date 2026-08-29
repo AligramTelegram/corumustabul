@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { activePros } from "@/data/pros";
 import { getCategory, getDistrict, getPro } from "@/lib/data";
+import { getActivePros } from "@/lib/pros";
 import { ContactButtons } from "@/components/ContactButtons";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { LinkChips } from "@/components/InternalLinks";
@@ -11,17 +11,18 @@ import { Icon } from "@/components/Icon";
 import { JsonLd } from "@/components/JsonLd";
 import { breadcrumbJsonLd, pageMeta, proJsonLd } from "@/lib/seo";
 
-export function generateStaticParams() {
-  return activePros().map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  return (await getActivePros()).map((p) => ({ slug: p.slug }));
 }
 
-export const dynamicParams = false;
+export const dynamicParams = true;
+export const revalidate = 600;
 
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const p = getPro(slug);
+  const p = await getPro(slug);
   if (!p) return {};
   const cats = p.categories.map((s) => getCategory(s)?.shortName).filter(Boolean);
   return pageMeta({
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProPage({ params }: Props) {
   const { slug } = await params;
-  const p = getPro(slug);
+  const p = await getPro(slug);
   if (!p) notFound();
 
   const cats = p.categories

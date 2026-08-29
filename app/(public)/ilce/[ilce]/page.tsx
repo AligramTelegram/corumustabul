@@ -18,6 +18,7 @@ export function generateStaticParams() {
 }
 
 export const dynamicParams = false;
+export const revalidate = 600;
 
 type Props = { params: Promise<{ ilce: string }> };
 
@@ -37,7 +38,7 @@ export default async function DistrictPage({ params }: Props) {
   const d = getDistrict(ilce);
   if (!d) notFound();
 
-  const pros = prosByDistrict(d.slug);
+  const pros = await prosByDistrict(d.slug);
   const neighbors = neighborDistricts(d.slug);
   const acil = categories.filter((c) => c.group === "acil");
   const diger = categories.filter((c) => c.group !== "acil");

@@ -1,11 +1,11 @@
 import type { MetadataRoute } from "next";
 import { categories } from "@/data/categories";
 import { districts } from "@/data/districts";
-import { activePros } from "@/data/pros";
+import { getActivePros } from "@/lib/pros";
 import { posts } from "@/data/rehber";
 import { site } from "@/lib/site";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const u = (path: string) => `${site.url}${path}`;
   const now = new Date();
 
@@ -46,7 +46,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  const ustalar = activePros().map((p) => ({
+  const ustalar = (await getActivePros()).map((p) => ({
     url: u(`/usta/${p.slug}`),
     lastModified: now,
     priority: 0.5,
