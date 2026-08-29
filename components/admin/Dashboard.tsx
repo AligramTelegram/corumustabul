@@ -27,20 +27,34 @@ function fmt(iso: string) {
   });
 }
 
-const FILTERS: { key: Bucket | "all"; label: string }[] = [
+type FilterKey = Bucket | "all" | "vitrin";
+const FILTERS: { key: FilterKey; label: string }[] = [
   { key: "all", label: "Tümü" },
+  { key: "vitrin", label: "Vitrinde" },
   { key: "expired", label: "Süresi geçmiş" },
   { key: "expiring", label: "Süresi yaklaşan" },
   { key: "active", label: "Aktif" },
   { key: "passive", label: "Pasif" },
 ];
 
+const vitrinGun = (until?: string): number | null => {
+  if (!until) return null;
+  const d = Math.ceil((Date.parse(until) - Date.now()) / 864e5);
+  return d > 0 ? d : null;
+};
+
 export function Dashboard({ pros }: { pros: ProWithId[] }) {
-  const [filter, setFilter] = useState<Bucket | "all">("all");
+  const [filter, setFilter] = useState<FilterKey>("all");
   const [q, setQ] = useState("");
 
   const withBucket = useMemo(
-    () => pros.map((p) => ({ p, b: bucketOf(p), d: daysLeft(p.paidUntil) })),
+    () =>
+      pros.map((p) => ({
+        p,
+        b: bucketOf(p),
+        d: daysLeft(p.paidUntil),
+        v: vitrinGun(p.featuredUntil),
+      })),
     [pros],
   );
 
@@ -66,10 +80,18 @@ export function Dashboard({ pros }: { pros: ProWithId[] }) {
   }, [pros]);
   const gaps = coverage.filter((x) => x.n === 0).length;
 
+  const vitrinCount = withBucket.filter((x) => x.v != null).length;
+
   const rows = useMemo(() => {
     const nq = q.trim().toLocaleLowerCase("tr");
     return withBucket
-      .filter(({ b }) => filter === "all" || b === filter)
+      .filter(({ b, v }) =>
+        filter === "all"
+          ? true
+          : filter === "vitrin"
+            ? v != null
+            : b === filter,
+      )
       .filter(({ p }) => {
         if (!nq) return true;
         const hay = [
@@ -104,8 +126,14 @@ export function Dashboard({ pros }: { pros: ProWithId[] }) {
       </div>
 
       {/* İstatistik */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <Stat label="Toplam" value={pros.length} />
+        <Stat
+          label="Vitrinde"
+          value={vitrinCount}
+          tone="bordo"
+          onClick={() => setFilter("vitrin")}
+        />
         <Stat
           label="Süresi geçmiş"
           value={counts.expired}
@@ -190,7 +218,7 @@ export function Dashboard({ pros }: { pros: ProWithId[] }) {
         {rows.length === 0 && (
           <p className="p-5 text-sm text-muted">Kayıt yok.</p>
         )}
-        {rows.map(({ p, b, d }) => (
+        {rows.map(({ p, b, d, v }) => (
           <div
             key={p.id}
             className="border-b border-border px-4 py-3 last:border-0"
@@ -209,9 +237,9 @@ export function Dashboard({ pros }: { pros: ProWithId[] }) {
                   >
                     {bucketLabel[b]}
                   </span>
-                  {p.featured && (
+                  {v != null && (
                     <span className="rounded-full bg-bordo/10 px-1.5 text-xs font-semibold text-bordo">
-                      ★
+                      ★ Vitrin · {v} gün
                     </span>
                   )}
                 </div>
@@ -240,7 +268,7 @@ export function Dashboard({ pros }: { pros: ProWithId[] }) {
                 id={p.id}
                 slug={p.slug}
                 status={p.status}
-                featured={p.featured}
+                featuredUntil={p.featuredUntil}
                 paidUntil={p.paidUntil}
               />
             </div>

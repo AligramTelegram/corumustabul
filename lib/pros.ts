@@ -18,6 +18,7 @@ type Row = {
   about: string[];
   working_hours: string;
   featured: boolean;
+  featured_until: string | null;
   rating: number | null;
   review_count: number | null;
   status: "active" | "passive";
@@ -25,7 +26,14 @@ type Row = {
   sort_order: number;
 };
 
-export type ProWithId = Pro & { id: string; sortOrder: number };
+export type ProWithId = Pro & {
+  id: string;
+  sortOrder: number;
+  featuredUntil?: string;
+};
+
+const vitrinAktif = (until: string | null | undefined) =>
+  Boolean(until && Date.parse(until) > Date.now());
 
 function toPro(r: Row): ProWithId {
   return {
@@ -43,7 +51,9 @@ function toPro(r: Row): ProWithId {
     photos: r.photos ?? undefined,
     about: r.about ?? [],
     workingHours: r.working_hours ?? "",
-    featured: r.featured,
+    // Vitrin: featured_until gelecekteyse aktif. Süre bitince otomatik düşer.
+    featured: vitrinAktif(r.featured_until),
+    featuredUntil: r.featured_until ?? undefined,
     rating: r.rating ?? undefined,
     reviewCount: r.review_count ?? undefined,
     status: r.status,
@@ -52,7 +62,9 @@ function toPro(r: Row): ProWithId {
   };
 }
 
-export function toRow(p: Partial<Pro> & { sortOrder?: number }) {
+export function toRow(
+  p: Partial<Pro> & { sortOrder?: number; featuredUntil?: string | null },
+) {
   const row: Record<string, unknown> = {};
   if (p.slug !== undefined) row.slug = p.slug;
   if (p.name !== undefined) row.name = p.name;
@@ -67,7 +79,10 @@ export function toRow(p: Partial<Pro> & { sortOrder?: number }) {
   if (p.photos !== undefined) row.photos = p.photos ?? [];
   if (p.about !== undefined) row.about = p.about;
   if (p.workingHours !== undefined) row.working_hours = p.workingHours;
-  if (p.featured !== undefined) row.featured = p.featured;
+  if (p.featuredUntil !== undefined) {
+    row.featured_until = p.featuredUntil;
+    row.featured = Boolean(p.featuredUntil);
+  }
   if (p.rating !== undefined) row.rating = p.rating ?? null;
   if (p.reviewCount !== undefined) row.review_count = p.reviewCount ?? null;
   if (p.status !== undefined) row.status = p.status;

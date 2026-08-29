@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase";
 import { toRow } from "@/lib/pros";
 import { slugify } from "@/lib/slug";
+import { vitrinBitis } from "@/lib/config";
 import type { Pro } from "@/lib/types";
 
 export async function POST(req: Request) {
@@ -10,7 +11,7 @@ export async function POST(req: Request) {
   if (!sb)
     return NextResponse.json({ error: "Supabase yok" }, { status: 500 });
 
-  const body = (await req.json()) as Partial<Pro>;
+  const body = (await req.json()) as Partial<Pro> & { featuredUntil?: string };
   if (!body.businessName || !body.phone) {
     return NextResponse.json(
       { error: "İşletme adı ve telefon zorunlu" },
@@ -23,10 +24,19 @@ export async function POST(req: Request) {
     body.paidUntil ||
     new Date(Date.now() + 365 * 864e5).toISOString().slice(0, 10);
 
+  // Vitrin: featuredUntil verilmişse onu, verilmeyip featured=true ise 15 gün
+  const featuredUntil =
+    body.featuredUntil !== undefined
+      ? body.featuredUntil || null
+      : body.featured
+        ? vitrinBitis()
+        : null;
+
   const row = toRow({
     ...body,
     slug,
     paidUntil,
+    featuredUntil,
     name: body.name || body.businessName,
     status: body.status || "active",
     phoneDisplay: body.phoneDisplay || body.phone,

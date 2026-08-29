@@ -4,9 +4,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { categories } from "@/data/categories";
 import { districts } from "@/data/districts";
+import { VITRIN_GUN } from "@/lib/config";
 import type { Pro } from "@/lib/types";
 
-type FormPro = Partial<Pro> & { id?: string };
+type FormPro = Partial<Pro> & { id?: string; featuredUntil?: string | null };
+
+const vitrinGun = (until?: string | null): number | null => {
+  if (!until) return null;
+  const d = Math.ceil((Date.parse(until) - Date.now()) / 864e5);
+  return d > 0 ? d : null;
+};
 
 const input =
   "w-full rounded-lg border border-border-strong bg-white px-3 py-2 text-sm outline-none focus:border-orange";
@@ -32,7 +39,7 @@ export function ProForm({ initial }: { initial?: FormPro }) {
     photos: [],
     about: [],
     workingHours: "",
-    featured: false,
+    featuredUntil: null,
     status: "active",
     rating: undefined,
     reviewCount: undefined,
@@ -297,14 +304,58 @@ export function ProForm({ initial }: { initial?: FormPro }) {
         </div>
       </div>
 
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={Boolean(f.featured)}
-          onChange={(e) => set("featured", e.target.checked)}
-        />
-        Vitrin (listede en üstte göster)
-      </label>
+      <div className="rounded-xl border border-border-strong bg-wash p-3">
+        <p className={label}>Vitrin</p>
+        {(() => {
+          const kalan = vitrinGun(f.featuredUntil);
+          if (kalan != null) {
+            return (
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+                <span className="font-semibold text-bordo">
+                  ★ Vitrinde · {kalan} gün kaldı
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const base = Math.max(
+                      Date.now(),
+                      Date.parse(f.featuredUntil as string),
+                    );
+                    set(
+                      "featuredUntil",
+                      new Date(base + VITRIN_GUN * 864e5).toISOString(),
+                    );
+                  }}
+                  className="rounded-lg bg-black/5 px-3 py-1.5 font-medium hover:bg-black/10"
+                >
+                  +{VITRIN_GUN} gün
+                </button>
+                <button
+                  type="button"
+                  onClick={() => set("featuredUntil", null)}
+                  className="rounded-lg border border-border-strong bg-white px-3 py-1.5 font-medium"
+                >
+                  Vitrinden çıkar
+                </button>
+              </div>
+            );
+          }
+          return (
+            <button
+              type="button"
+              onClick={() =>
+                set(
+                  "featuredUntil",
+                  new Date(Date.now() + VITRIN_GUN * 864e5).toISOString(),
+                )
+              }
+              className="mt-2 rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-primary-fg"
+            >
+              ☆ Vitrine al ({VITRIN_GUN} gün)
+            </button>
+          );
+        })()}
+      </div>
 
       {err && <p className="text-sm text-bordo">{err}</p>}
 

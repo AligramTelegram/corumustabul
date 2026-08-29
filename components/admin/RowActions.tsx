@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { VITRIN_GUN } from "@/lib/config";
 
 function addMonths(iso: string, months: number): string {
   const base = new Date(iso + "T00:00:00");
@@ -11,17 +12,23 @@ function addMonths(iso: string, months: number): string {
   return start.toISOString().slice(0, 10);
 }
 
+function vitrinGunKaldi(until?: string): number | null {
+  if (!until) return null;
+  const d = Math.ceil((Date.parse(until) - Date.now()) / 864e5);
+  return d > 0 ? d : null;
+}
+
 export function RowActions({
   id,
   slug,
   status,
-  featured,
+  featuredUntil,
   paidUntil,
 }: {
   id: string;
   slug: string;
   status: "active" | "passive";
-  featured: boolean;
+  featuredUntil?: string;
   paidUntil: string;
 }) {
   const router = useRouter();
@@ -30,10 +37,13 @@ export function RowActions({
   const [up, setUp] = useState(false);
   const btn = useRef<HTMLButtonElement>(null);
 
+  const vitrinKalan = vitrinGunKaldi(featuredUntil);
+  const vitrinde = vitrinKalan != null;
+
   function toggle() {
     if (!open && btn.current) {
       const r = btn.current.getBoundingClientRect();
-      setUp(window.innerHeight - r.bottom < 340);
+      setUp(window.innerHeight - r.bottom < 380);
     }
     setOpen((o) => !o);
   }
@@ -85,13 +95,38 @@ export function RowActions({
               up ? "bottom-full mb-1" : "top-full mt-1"
             }`}
           >
-            <button
-              disabled={busy}
-              onClick={() => patch({ featured: !featured })}
-              className={item}
-            >
-              {featured ? "★ Vitrinden çıkar" : "☆ Vitrine al"}
-            </button>
+            {/* Vitrin */}
+            {vitrinde ? (
+              <>
+                <div className="px-2.5 pt-1 text-xs font-semibold uppercase tracking-wide text-bordo">
+                  ★ Vitrinde · {vitrinKalan} gün
+                </div>
+                <button
+                  disabled={busy}
+                  onClick={() => patch({ vitrin: "extend" })}
+                  className={item}
+                >
+                  +{VITRIN_GUN} gün uzat
+                </button>
+                <button
+                  disabled={busy}
+                  onClick={() => patch({ vitrin: "remove" })}
+                  className={item}
+                >
+                  Vitrinden çıkar
+                </button>
+              </>
+            ) : (
+              <button
+                disabled={busy}
+                onClick={() => patch({ vitrin: "add" })}
+                className={item}
+              >
+                ☆ Vitrine al ({VITRIN_GUN} gün)
+              </button>
+            )}
+
+            <div className="my-1 border-t border-border" />
             <button
               disabled={busy}
               onClick={() =>
@@ -104,7 +139,7 @@ export function RowActions({
 
             <div className="my-1 border-t border-border" />
             <div className="px-2.5 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-muted">
-              Süre uzat
+              Abonelik uzat
             </div>
             <div className="grid grid-cols-2 gap-1 px-1 pb-1">
               {(

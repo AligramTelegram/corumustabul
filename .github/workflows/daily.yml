@@ -1,0 +1,16 @@
+name: Günlük tazeleme
+
+# Her gece 02:00 (TR) siteyi yeniler; süresi biten vitrin/abonelik kesin düşer.
+on:
+  schedule:
+    - cron: "0 23 * * *" # 23:00 UTC = 02:00 TR
+  workflow_dispatch:
+
+jobs:
+  revalidate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Revalidate
+        run: |
+          curl -fsS "https://corumustabul.com/api/revalidate?key=${{ secrets.ADMIN_PASSWORD }}" \
+            && echo "" && echo "tamam"
